@@ -22,7 +22,8 @@
     "paths": {
       "@/*": ["./src/client/*"],
       "~/*": ["./src/server/*"],
-      "#/*": ["./src/lib/*"]
+      "#/*": ["./src/lib/*"],
+      "#client/*": ["./src/client/*"]
     },
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,

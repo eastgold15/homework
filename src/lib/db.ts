@@ -1,6 +1,5 @@
-import { Elysia } from "elysia";
-import "dotenv/config";
 import { drizzle } from "drizzle-orm/bun-sqlite";
+import { Elysia } from "elysia";
 
 export const db = drizzle("homework.db");
 
