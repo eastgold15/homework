@@ -1,14 +1,38 @@
+import { fromTypes, openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
 import { ServerApp } from "~/index";
+import { errorSuite } from "~/middleware/err/errorSuite.plugin";
+import { loggerPlugin } from "~/middleware/logger";
 import frontendApp from "./frontend";
 
-const app = new Elysia().use(frontendApp).use(ServerApp).listen(4000);
-
-// 输出服务器运行信息
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
-
-// 输出带下划线的可点击链接到终端，方便直接打开浏览器
-const url = `http://${app.server?.hostname}:${app.server?.port}`;
-console.log(`🔗 Open in browser: \x1b]8;;${url}\x1b\\${url}\x1b]8;;\x1b\\`);
+const app = new Elysia()
+  .use(
+    openapi({
+      documentation: {
+        info: {
+          title: "Gin Shopping API",
+          version: "1.0.71",
+          description: "基于 Elysia + Drizzle + TypeScript 的电商后端 API",
+        },
+        tags: [],
+      },
+      references: fromTypes(
+        process.env.NODE_ENV === "production"
+          ? "dist/index.d.ts"
+          : "src/server.ts",
+        {
+          // 关键：指定项目根目录，以便编译器能找到 tsconfig.json 和其他文件
+          // 这里使用 import.meta.dir (Bun) 或 process.cwd()
+          projectRoot: process.cwd(),
+          // 如果你的 tsconfig 在根目录
+          tsconfigPath: "tsconfig.json",
+          debug: process.env.NODE_ENV !== "production",
+        }
+      ),
+    })
+  )
+  .use(loggerPlugin)
+  .use(errorSuite)
+  .use(frontendApp)
+  .use(ServerApp)
+  .listen(4000);

@@ -1,5 +1,5 @@
-import React from "react";
-import { Mail, Shield, Server, ArrowRight, Save } from "lucide-react";
+import { ArrowRight, Mail, Save, Server, Shield } from "lucide-react";
+import type React from "react";
 import type { AppConfig } from "../types";
 
 interface Props {
@@ -16,134 +16,132 @@ const ConfigPanel: React.FC<Props> = ({
   onStart,
   isFishing,
   onSave,
-}) => {
-  return (
-    <div className="shadcn-card p-6 flex flex-col gap-6">
-      <div>
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <SettingsIcon />
-          邮箱接入
-        </h3>
-        <p className="text-sm text-muted-foreground mt-1">
-          同步 IMAP 邮件服务器中的最新数据
-        </p>
-      </div>
+}) => (
+  <div className="shadcn-card flex flex-col gap-6 p-6">
+    <div>
+      <h3 className="flex items-center gap-2 font-semibold text-lg">
+        <SettingsIcon />
+        邮箱接入
+      </h3>
+      <p className="mt-1 text-muted-foreground text-sm">
+        同步 IMAP 邮件服务器中的最新数据
+      </p>
+    </div>
 
-      <div className="space-y-4">
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold uppercase tracking-tight text-muted-foreground">
-            邮箱账户
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="email"
-              placeholder="example@qq.com"
-              value={config.email}
-              onChange={(e) =>
-                setConfig((prev) => ({ ...prev, email: e.target.value }))
-              }
-              className="shadcn-input w-full pl-10 rounded-md"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold uppercase tracking-tight text-muted-foreground">
-            授权码
-          </label>
-          <div className="relative">
-            <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="password"
-              placeholder="•••••••••"
-              value={config.password}
-              onChange={(e) =>
-                setConfig((prev) => ({ ...prev, password: e.target.value }))
-              }
-              className="shadcn-input w-full pl-10 rounded-md"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold uppercase tracking-tight text-muted-foreground">
-            命名规则
-          </label>
+    <div className="space-y-4">
+      <div className="space-y-1.5">
+        <label className="font-semibold text-muted-foreground text-xs uppercase tracking-tight">
+          邮箱账户
+        </label>
+        <div className="relative">
+          <Mail className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
           <input
-            type="text"
-            value={config.namingRule}
+            className="shadcn-input w-full rounded-md pl-10"
             onChange={(e) =>
-              setConfig((prev) => ({ ...prev, namingRule: e.target.value }))
+              setConfig((prev) => ({ ...prev, email: e.target.value }))
             }
-            className="shadcn-input w-full rounded-md"
-            placeholder="{姓名}_{学号}_{作业名}"
+            placeholder="example@qq.com"
+            type="email"
+            value={config.email}
           />
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-tight text-muted-foreground">
-              IMAP 地址
-            </label>
-            <input
-              type="text"
-              value={config.server}
-              onChange={(e) =>
-                setConfig((prev) => ({ ...prev, server: e.target.value }))
-              }
-              className="shadcn-input w-full rounded-md"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-tight text-muted-foreground">
-              端口
-            </label>
-            <input
-              type="number"
-              value={config.port}
-              onChange={(e) =>
-                setConfig((prev) => ({
-                  ...prev,
-                  port: parseInt(e.target.value),
-                }))
-              }
-              className="shadcn-input w-full rounded-md"
-            />
-          </div>
+      <div className="space-y-1.5">
+        <label className="font-semibold text-muted-foreground text-xs uppercase tracking-tight">
+          授权码
+        </label>
+        <div className="relative">
+          <Shield className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
+          <input
+            className="shadcn-input w-full rounded-md pl-10"
+            onChange={(e) =>
+              setConfig((prev) => ({ ...prev, password: e.target.value }))
+            }
+            placeholder="•••••••••"
+            type="password"
+            value={config.password}
+          />
         </div>
       </div>
 
-      <div className="flex gap-3">
-        <button
-          onClick={onSave}
-          className="shadcn-button-outline flex-1 py-2.5 rounded-md flex items-center justify-center gap-2"
-        >
-          <Save className="w-4 h-4" />
-          保存配置
-        </button>
-        <button
-          onClick={onStart}
-          disabled={isFishing}
-          className={`shadcn-button-primary flex-1 py-2.5 rounded-md flex items-center justify-center gap-2 ${isFishing ? "opacity-50 cursor-not-allowed" : ""}`}
-        >
-          {isFishing ? (
-            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-          ) : (
-            <>
-              开始捕捞作业 <ArrowRight className="w-4 h-4" />
-            </>
-          )}
-        </button>
+      <div className="space-y-1.5">
+        <label className="font-semibold text-muted-foreground text-xs uppercase tracking-tight">
+          命名规则
+        </label>
+        <input
+          className="shadcn-input w-full rounded-md"
+          onChange={(e) =>
+            setConfig((prev) => ({ ...prev, namingRule: e.target.value }))
+          }
+          placeholder="{姓名}_{学号}_{作业名}"
+          type="text"
+          value={config.namingRule}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="font-semibold text-muted-foreground text-xs uppercase tracking-tight">
+            IMAP 地址
+          </label>
+          <input
+            className="shadcn-input w-full rounded-md"
+            onChange={(e) =>
+              setConfig((prev) => ({ ...prev, server: e.target.value }))
+            }
+            type="text"
+            value={config.server}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <label className="font-semibold text-muted-foreground text-xs uppercase tracking-tight">
+            端口
+          </label>
+          <input
+            className="shadcn-input w-full rounded-md"
+            onChange={(e) =>
+              setConfig((prev) => ({
+                ...prev,
+                port: Number.parseInt(e.target.value, 10),
+              }))
+            }
+            type="number"
+            value={config.port}
+          />
+        </div>
       </div>
     </div>
-  );
-};
+
+    <div className="flex gap-3">
+      <button
+        className="shadcn-button-outline flex flex-1 items-center justify-center gap-2 rounded-md py-2.5"
+        onClick={onSave}
+      >
+        <Save className="h-4 w-4" />
+        保存配置
+      </button>
+      <button
+        className={`shadcn-button-primary flex flex-1 items-center justify-center gap-2 rounded-md py-2.5 ${isFishing ? "cursor-not-allowed opacity-50" : ""}`}
+        disabled={isFishing}
+        onClick={onStart}
+      >
+        {isFishing ? (
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+        ) : (
+          <>
+            开始捕捞作业 <ArrowRight className="h-4 w-4" />
+          </>
+        )}
+      </button>
+    </div>
+  </div>
+);
 
 function SettingsIcon() {
   return (
-    <div className="p-1.5 bg-muted rounded-md">
-      <Server className="w-4 h-4" />
+    <div className="rounded-md bg-muted p-1.5">
+      <Server className="h-4 w-4" />
     </div>
   );
 }

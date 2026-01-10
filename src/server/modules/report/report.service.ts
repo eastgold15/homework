@@ -1,7 +1,7 @@
-import ExcelJS from "exceljs";
 import { eq } from "drizzle-orm";
+import ExcelJS from "exceljs";
 import { db } from "#/db";
-import { studentsTable, homeworkTable } from "#/db/table.schema";
+import { homeworkTable, studentsTable } from "#/db/table.schema";
 
 export const reportService = {
   exportReport: async (): Promise<{

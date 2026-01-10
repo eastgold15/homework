@@ -6,8 +6,8 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import imaps from "imap-simple";
 import { eq } from "drizzle-orm";
+import imaps from "imap-simple";
 import { db } from "#/db";
 import { homeworkTable, studentsTable } from "#/db/table.schema";
 import { emailService } from "../email/email.service";
@@ -137,10 +137,9 @@ export const homeworkService = {
             attachment
           )) as Buffer;
 
-          const emailBody =
-            message.parts && message.parts[0]
-              ? message.parts[0].body?.toString()
-              : "";
+          const emailBody = message.parts?.[0]
+            ? message.parts[0].body?.toString()
+            : "";
           const namingRule = safeConfig.namingRule
             ? safeConfig.namingRule
             : "{姓名}_{学号}_{作业名}";
@@ -193,16 +192,15 @@ export const homeworkService = {
     }
   },
 
-  getHomeworkList: async () => {
-    return await db
+  getHomeworkList: async () =>
+    await db
       .select({
         homework: homeworkTable,
         student: studentsTable,
       })
       .from(homeworkTable)
       .leftJoin(studentsTable, eq(homeworkTable.studentId, studentsTable.id))
-      .orderBy(homeworkTable.createdAt);
-  },
+      .orderBy(homeworkTable.createdAt),
 
   deleteHomework: async (id: number) => {
     const homework = await db

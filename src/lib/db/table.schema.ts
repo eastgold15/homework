@@ -1,14 +1,21 @@
 import * as s from "drizzle-orm/sqlite-core";
+import { uniqueIndex } from "drizzle-orm/sqlite-core";
 
-export const emailConfigTable = s.sqliteTable("email_config", {
-  id: s.integer("id").primaryKey({ autoIncrement: true }),
-  email: s.text("email").notNull(),
-  password: s.text("password").notNull(),
-  imapServer: s.text("imap_server").default("imap.qq.com"),
-  imapPort: s.integer("imap_port").default(993),
-  namingRule: s.text("naming_rule"),
-  createdAt: s.integer("created_at", { mode: "timestamp" }).default(new Date()),
-});
+export const emailConfigTable = s.sqliteTable(
+  "email_config",
+  {
+    id: s.integer("id").primaryKey({ autoIncrement: true }),
+    email: s.text("email").notNull().unique(),
+    password: s.text("password").notNull(),
+    imapServer: s.text("imap_server").default("imap.qq.com"),
+    imapPort: s.integer("imap_port").default(993),
+    namingRule: s.text("naming_rule"),
+    createdAt: s
+      .integer("created_at", { mode: "timestamp" })
+      .default(new Date()),
+  },
+  (table) => [uniqueIndex("email_config_email_unique").on(table.email)]
+);
 
 export const homeworkTable = s.sqliteTable("homework", {
   id: s.integer("id").primaryKey({ autoIncrement: true }),

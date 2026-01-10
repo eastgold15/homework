@@ -1,12 +1,11 @@
-import ExcelJS from "exceljs";
 import { eq, notInArray } from "drizzle-orm";
+import ExcelJS from "exceljs";
 import { db } from "#/db";
-import { studentsTable, homeworkTable } from "#/db/table.schema";
+import { homeworkTable, studentsTable } from "#/db/table.schema";
 
 export const studentService = {
-  getStudents: async () => {
-    return await db.select().from(studentsTable).orderBy(studentsTable.name);
-  },
+  getStudents: async () =>
+    await db.select().from(studentsTable).orderBy(studentsTable.name),
 
   importFromExcel: async (
     file: File

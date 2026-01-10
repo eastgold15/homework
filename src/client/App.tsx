@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from "react";
 import {
-  LayoutGrid,
-  Settings,
-  Waves,
   ClipboardList,
   Fish,
+  LayoutGrid,
   Search,
+  Settings,
+  Waves,
 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { rpc } from "#/api";
-import type { Student, HomeworkItem, AppConfig } from "#client/types";
-import ConfigPanel from "./components/ConfigPanel";
+import type { AppConfig, HomeworkItem, Student } from "#client/types";
 import ClassListEditor from "./components/ClassListEditor";
+import ConfigPanel from "./components/ConfigPanel";
 import OceanBucket from "./components/OceanBucket";
 import ResultsDashboard from "./components/ResultsDashboard";
+import TestPage from "./page/test";
 import "./index.css";
 
 export default function App() {
@@ -20,13 +21,13 @@ export default function App() {
   const [homeworks, setHomeworks] = useState<HomeworkItem[]>([]);
   const [isFishing, setIsFishing] = useState(false);
   const [activeTab, setActiveTab] = useState<
-    "overview" | "settings" | "bucket" | "report"
-  >("overview");
+    "overview" | "settings" | "bucket" | "report" | "test"
+  >("test");
   const [config, setConfig] = useState<AppConfig>({
-    email: "",
-    password: "",
-    server: "imap.qq.com",
-    port: 993,
+    email: "1960825664@qq.com",
+    password: "ltexjnbspblkdehd",
+    server: "smtp.qq.com",
+    port: 465,
     namingRule: "{姓名}_{学号}_{作业名}",
   });
 
@@ -37,46 +38,72 @@ export default function App() {
   }, []);
 
   const loadConfig = async () => {
-    const { data: result } = await rpc.api.email.config.get();
-    if (result?.success && result.data) {
-      setConfig({
-        email: result.data.email,
-        password: "",
-        server: result.data.imapServer || "imap.qq.com",
-        port: result.data.imapPort || 993,
-        namingRule: result.data.namingRule || "{姓名}_{学号}_{作业名}",
-      });
+    try {
+      const { data: result } = await rpc.api.email.config.get();
+      if (result?.success && result.data) {
+        setConfig({
+          email: result.data.email,
+          password: "",
+          server: result.data.imapServer || "imap.163.com",
+          port: result.data.imapPort || 993,
+          namingRule: result.data.namingRule || "{姓名}_{学号}_{作业名}",
+        });
+      }
+    } catch (error) {
+      console.error("加载配置失败:", error);
     }
   };
 
   const loadStudents = async () => {
-    const { data: studentList } = await rpc.api.student.list.get();
-    if (studentList) {
-      setStudents(
-        studentList.map((s: any) => ({
-          id: s.id,
-          name: s.name,
-          studentId: s.student_id,
-          className: s.class_name,
-          submitted: false,
-        }))
-      );
+    try {
+      const { data: studentList } = await rpc.api.student.list.get();
+      if (studentList) {
+        setStudents(
+          studentList.map((s: any) => ({
+            id: s.id,
+            name: s.name,
+            studentId: s.student_id,
+            className: s.class_name,
+            submitted: false,
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("加载学生失败:", error);
     }
   };
 
   const loadHomeworks = async () => {
-    const { data: hwList } = await rpc.api.homework.list.get();
-    if (hwList) {
-      setHomeworks(
-        hwList.map((h: any) => ({
-          id: h.homework.id,
-          studentId: h.homework.student_id,
-          fileName: h.homework.file_name,
-          originalName: h.homework.original_name,
-          emailFrom: h.homework.email_from,
-          emailDate: h.homework.email_date,
-        }))
-      );
+    try {
+      const { data: hwList } = await rpc.api.homework.list.get();
+      if (hwList) {
+        const submittedIds = new Set();
+        hwList.forEach((h: any) => {
+          if (h.homework.student_id) {
+            submittedIds.add(h.homework.student_id);
+          }
+        });
+
+        setHomeworks(
+          hwList.map((h: any) => ({
+            id: h.homework.id,
+            studentId: h.homework.student_id,
+            fileName: h.homework.file_name,
+            originalName: h.homework.original_name,
+            emailFrom: h.homework.email_from,
+            emailDate: h.homework.email_date,
+          }))
+        );
+
+        setStudents((prev) =>
+          prev.map((s) => ({
+            ...s,
+            submitted: submittedIds.has(s.id),
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("加载作业失败:", error);
     }
   };
 
@@ -98,9 +125,13 @@ export default function App() {
   };
 
   const handleSaveConfig = async () => {
-    const { data: result } = await rpc.api.email.config.post(config);
-    if (result?.success) {
-      alert("配置保存成功");
+    try {
+      const { data: result } = await rpc.api.email.config.post(config);
+      if (result?.success) {
+        alert("配置保存成功");
+      }
+    } catch (error) {
+      console.error("保存配置失败:", error);
     }
   };
 
@@ -108,60 +139,67 @@ export default function App() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <aside className="w-64 border-r bg-card flex flex-col p-6 space-y-8">
+      <aside className="flex w-64 flex-col space-y-8 border-r bg-card p-6">
         <div className="flex items-center gap-3 px-2">
-          <div className="bg-primary p-2 rounded-xl">
-            <Fish className="w-6 h-6 text-primary-foreground" />
+          <div className="rounded-xl bg-primary p-2">
+            <Fish className="h-6 w-6 text-primary-foreground" />
           </div>
           <span className="font-bold text-xl tracking-tight">作业助手</span>
         </div>
 
         <nav className="flex-1 space-y-1">
           <NavItem
-            icon={<LayoutGrid className="w-4 h-4" />}
-            label="仪表盘"
+            active={activeTab === "test"}
+            icon={<LayoutGrid className="h-4 w-4" />}
+            label="测试"
+            onClick={() => setActiveTab("test")}
+          />
+          <NavItem
             active={activeTab === "overview"}
+            icon={<LayoutGrid className="h-4 w-4" />}
+            label="仪表盘"
             onClick={() => setActiveTab("overview")}
           />
           <NavItem
-            icon={<Waves className="w-4 h-4" />}
-            label="捕捞池"
             active={activeTab === "bucket"}
+            icon={<Waves className="h-4 w-4" />}
+            label="捕捞池"
             onClick={() => setActiveTab("bucket")}
           />
           <NavItem
-            icon={<ClipboardList className="w-4 h-4" />}
-            label="作业报告"
             active={activeTab === "report"}
+            icon={<ClipboardList className="h-4 w-4" />}
+            label="作业报告"
             onClick={() => setActiveTab("report")}
           />
           <NavItem
-            icon={<Settings className="w-4 h-4" />}
-            label="设置"
             active={activeTab === "settings"}
+            icon={<Settings className="h-4 w-4" />}
+            label="设置"
             onClick={() => setActiveTab("settings")}
           />
         </nav>
 
-        <div className="p-4 bg-muted/50 rounded-xl border border-border">
-          <div className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+        <div className="rounded-xl border border-border bg-muted/50 p-4">
+          <div className="mb-2 font-semibold text-muted-foreground text-xs uppercase">
             作业进度
           </div>
-          <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
             <div
               className="h-full bg-primary transition-all duration-500"
               style={{ width: `${(submittedCount / students.length) * 100}%` }}
             />
           </div>
-          <div className="mt-2 text-xs font-medium">
+          <div className="mt-2 font-medium text-xs">
             {submittedCount} / {students.length} 已交
           </div>
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col overflow-hidden bg-[#fafafa]">
-        <header className="h-16 border-b bg-card flex items-center justify-between px-8">
-          <h2 className="text-lg font-semibold">
+      <main className="flex flex-1 flex-col overflow-hidden bg-[#fafafa]">
+        <header className="flex h-16 items-center justify-between border-b bg-card px-8">
+          <h2 className="font-semibold text-lg">
+            {activeTab === "test" && "API 测试"}
             {activeTab === "overview" && "概览"}
             {activeTab === "bucket" && "作业捕捞池"}
             {activeTab === "report" && "收作业报告"}
@@ -169,63 +207,65 @@ export default function App() {
           </h2>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
               <input
-                type="text"
+                className="w-64 rounded-full border border-muted bg-muted/50 px-4 py-2 pl-10 text-sm"
                 placeholder="搜索学生..."
-                className="pl-10 w-64 rounded-full border border-muted bg-muted/50 px-4 py-2 text-sm"
+                type="text"
               />
             </div>
           </div>
         </header>
 
         <div className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-5xl mx-auto space-y-8">
+          <div className="mx-auto max-w-5xl space-y-8">
+            {activeTab === "test" && <TestPage />}
+
             {activeTab === "overview" && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <StatCard
+                  icon={<ClipboardList />}
                   label="总名单人数"
                   value={students.length}
-                  icon={<ClipboardList />}
                 />
                 <StatCard
+                  icon={<Fish />}
                   label="今日已捕获"
                   value={homeworks.length}
-                  icon={<Fish />}
                 />
                 <StatCard
+                  color="text-destructive"
+                  icon={<LayoutGrid />}
                   label="缺交率"
                   value={`${Math.round(((students.length - submittedCount) / students.length) * 100)}%`}
-                  icon={<LayoutGrid />}
-                  color="text-destructive"
                 />
 
-                <div className="md:col-span-2 space-y-6">
+                <div className="space-y-6 md:col-span-2">
                   <ClassListEditor
-                    students={students}
                     setStudents={setStudents}
+                    students={students}
                   />
                 </div>
                 <div className="md:col-span-1">
                   <ConfigPanel
                     config={config}
-                    setConfig={setConfig}
-                    onStart={handleStartFishing}
                     isFishing={isFishing}
                     onSave={handleSaveConfig}
+                    onStart={handleStartFishing}
+                    setConfig={setConfig}
                   />
                 </div>
               </div>
             )}
 
             {activeTab === "settings" && (
-              <div className="max-w-2xl mx-auto">
+              <div className="mx-auto max-w-2xl">
                 <ConfigPanel
                   config={config}
-                  setConfig={setConfig}
-                  onStart={handleStartFishing}
                   isFishing={isFishing}
                   onSave={handleSaveConfig}
+                  onStart={handleStartFishing}
+                  setConfig={setConfig}
                 />
               </div>
             )}
@@ -255,12 +295,12 @@ function NavItem({
 }) {
   return (
     <button
-      onClick={onClick}
-      className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+      className={`flex w-full items-center gap-3 rounded-md px-3 py-2 font-medium text-sm transition-colors ${
         active
           ? "bg-secondary text-foreground"
           : "text-muted-foreground hover:bg-muted hover:text-foreground"
       }`}
+      onClick={onClick}
     >
       {icon}
       {label}
@@ -280,10 +320,10 @@ function StatCard({
   color?: string;
 }) {
   return (
-    <div className="shadcn-card p-6 flex flex-col gap-2">
+    <div className="shadcn-card flex flex-col gap-2 p-6">
       <div className="flex items-center justify-between text-muted-foreground">
-        <span className="text-sm font-medium">{label}</span>
-        <div className="p-1.5 bg-muted rounded-md">
+        <span className="font-medium text-sm">{label}</span>
+        <div className="rounded-md bg-muted p-1.5">
           {React.isValidElement(icon)
             ? React.cloneElement(icon as React.ReactElement<any>, {
                 className: "w-4 h-4",
@@ -291,7 +331,7 @@ function StatCard({
             : icon}
         </div>
       </div>
-      <div className={`text-2xl font-bold ${color}`}>{value}</div>
+      <div className={`font-bold text-2xl ${color}`}>{value}</div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { Users, UserPlus, X, Trash2 } from "lucide-react";
-import type { Student } from "../../types";
+import { Trash2, UserPlus, Users } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import type { Student } from "@/types";
 
 interface Props {
   students: Student[];
@@ -29,65 +30,65 @@ const ClassListEditor: React.FC<Props> = ({ students, setStudents }) => {
   };
 
   return (
-    <div className="shadcn-card p-6 flex flex-col h-[520px]">
-      <div className="flex items-center justify-between mb-6">
+    <div className="shadcn-card flex h-[520px] flex-col p-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <div className="p-1.5 bg-muted rounded-md">
-              <Users className="w-4 h-4" />
+          <h3 className="flex items-center gap-2 font-semibold text-lg">
+            <div className="rounded-md bg-muted p-1.5">
+              <Users className="h-4 w-4" />
             </div>
             学生名单
           </h3>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="mt-0.5 text-muted-foreground text-sm">
             管理作业提交的核对名单
           </p>
         </div>
-        <div className="text-xs font-bold bg-secondary px-2.5 py-1 rounded-full">
+        <div className="rounded-full bg-secondary px-2.5 py-1 font-bold text-xs">
           {students.length} 位学生
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-1 mb-6 custom-scrollbar">
+      <div className="-mr-2 custom-scrollbar mb-6 flex-1 space-y-1 overflow-y-auto pr-2">
         {students.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed rounded-lg">
-            <Users className="w-8 h-8 mb-2 opacity-20" />
+          <div className="flex h-full flex-col items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground">
+            <Users className="mb-2 h-8 w-8 opacity-20" />
             <p className="text-sm">暂无名单，请导入</p>
           </div>
         ) : (
           students.map((s) => (
             <div
+              className="group flex items-center justify-between rounded-md px-3 py-2 transition-colors hover:bg-muted/50"
               key={s.id}
-              className="group flex items-center justify-between px-3 py-2 rounded-md hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-bold text-muted-foreground uppercase">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-bold text-muted-foreground text-xs uppercase">
                   {s.name.charAt(0)}
                 </div>
-                <span className="text-sm font-medium">{s.name}</span>
+                <span className="font-medium text-sm">{s.name}</span>
               </div>
               <button
+                className="rounded-md p-1.5 text-muted-foreground opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
                 onClick={() => removeStudent(s.id)}
-                className="opacity-0 group-hover:opacity-100 p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-all"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="h-3.5 w-3.5" />
               </button>
             </div>
           ))
         )}
       </div>
 
-      <div className="space-y-3 pt-4 border-t">
+      <div className="space-y-3 border-t pt-4">
         <textarea
-          placeholder="批量粘贴学生姓名 (以换行或逗号分隔)"
-          className="shadcn-input w-full h-24 rounded-md resize-none"
-          value={newNames}
+          className="shadcn-input h-24 w-full resize-none rounded-md"
           onChange={(e) => setNewNames(e.target.value)}
+          placeholder="批量粘贴学生姓名 (以换行或逗号分隔)"
+          value={newNames}
         />
         <button
+          className="shadcn-button-outline flex w-full items-center justify-center gap-2 rounded-md py-2 font-semibold text-sm"
           onClick={handleBulkAdd}
-          className="shadcn-button-outline w-full py-2 rounded-md text-sm font-semibold flex items-center justify-center gap-2"
         >
-          <UserPlus className="w-4 h-4" />
+          <UserPlus className="h-4 w-4" />
           导入名单
         </button>
       </div>

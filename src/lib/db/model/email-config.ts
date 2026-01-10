@@ -2,7 +2,6 @@ import { t } from "elysia";
 import { type InferDTO, spread } from "../helper/utils";
 import { emailConfigTable } from "../table.schema";
 
-/** [Auto-Generated] Do not edit this tag to keep updates. @generated */
 export const EmailConfigInsertFields = spread(emailConfigTable, "insert");
 /** [Auto-Generated] Do not edit this tag to keep updates. @generated */
 export const EmailConfigFields = spread(emailConfigTable, "select");
@@ -13,23 +12,13 @@ export const EmailConfigContract = {
   }),
 
   Create: t.Object({
-    ...t.Omit(t.Object(EmailConfigInsertFields), [
-      "id",
-      "createdAt",
-      "updatedAt",
-    ]).properties,
-    startDate: t.String(),
-    endDate: t.String(),
+    ...t.Omit(t.Object(EmailConfigInsertFields), ["id", "createdAt"])
+      .properties,
   }),
   Update: t.Partial(
     t.Object({
-      ...t.Omit(t.Object(EmailConfigInsertFields), [
-        "id",
-        "createdAt",
-        "updatedAt",
-      ]).properties,
-      startDate: t.String(),
-      endDate: t.String(),
+      ...t.Omit(t.Object(EmailConfigInsertFields), ["id", "createdAt"])
+        .properties,
     })
   ),
 
