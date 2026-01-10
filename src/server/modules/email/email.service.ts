@@ -1,6 +1,6 @@
+import { eq } from "drizzle-orm";
 import imaps from "imap-simple";
 import { db } from "#/db";
-import type { EmailConfigContract } from "#/db/model/email-config";
 import { emailConfigTable } from "#/db/table.schema";
 
 export const emailService = {
@@ -13,18 +13,39 @@ export const emailService = {
     return result[0];
   },
 
-  saveConfig: async (config: typeof EmailConfigContract.Create.static) => {
-    await db
-      .insert(emailConfigTable)
-      .values(config)
-      // 关键：冲突时执行替换/更新（根据你的唯一约束选择）
-      .onConflictDoUpdate({
-        // 冲突键：如果 email 是唯一键，用 eq(emailConfigTable.email, config.email)
-        // 如果 id 是主键但新增时没有 id，建议用 email 作为唯一约束
-        target: emailConfigTable.email, // 假设 email 字段有唯一索引
-        set: config,
-      });
+  saveConfig: async (config: {
+    email: string;
+    password: string;
+    imapServer?: string;
+    imapPort?: number;
+    namingRule?: string;
+  }) => {
+    const existing = await db
+      .select()
+      .from(emailConfigTable)
+      .orderBy(emailConfigTable.id)
+      .limit(1);
 
+    if (existing && existing.length > 0 && existing[0]) {
+      await db
+        .update(emailConfigTable)
+        .set({
+          email: config.email,
+          password: config.password,
+          imapServer: config.imapServer ?? "imap.qq.com",
+          imapPort: config.imapPort ?? 993,
+          namingRule: config.namingRule ?? "",
+        })
+        .where(eq(emailConfigTable.id, existing[0].id));
+    } else {
+      await db.insert(emailConfigTable).values({
+        email: config.email,
+        password: config.password,
+        imapServer: config.imapServer ?? "imap.qq.com",
+        imapPort: config.imapPort ?? 993,
+        namingRule: config.namingRule ?? "",
+      });
+    }
     return { success: true };
   },
 

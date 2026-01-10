@@ -7,10 +7,10 @@ import {
   Share2,
 } from "lucide-react";
 import type React from "react";
-import type { Student } from "@/types";
+import type { StudentContract } from "#/db/model/student.model";
 
 interface Props {
-  students: Student[];
+  students: StudentContract["Student"][];
 }
 
 const ResultsDashboard: React.FC<Props> = ({ students }) => {

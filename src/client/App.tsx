@@ -6,28 +6,33 @@ import {
   Settings,
   Waves,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { rpc } from "#/api";
-import type { AppConfig, HomeworkItem, Student } from "#client/types";
 import ClassListEditor from "./components/ClassListEditor";
 import ConfigPanel from "./components/ConfigPanel";
 import OceanBucket from "./components/OceanBucket";
 import ResultsDashboard from "./components/ResultsDashboard";
 import TestPage from "./page/test";
 import "./index.css";
+import type { EmailConfigContract } from "#/db/model/email-config";
+import type { HomeworkContract } from "#/db/model/home-work.model";
+import type { StudentContract } from "#/db/model/student.model";
 
 export default function App() {
-  const [students, setStudents] = useState<Student[]>([]);
-  const [homeworks, setHomeworks] = useState<HomeworkItem[]>([]);
+  const [students, setStudents] = useState<StudentContract["Student"][]>([]);
+  const [homeworks, setHomeworks] = useState<
+    HomeworkContract["HomeworkItem"][]
+  >([]);
   const [isFishing, setIsFishing] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "overview" | "settings" | "bucket" | "report" | "test"
   >("test");
-  const [config, setConfig] = useState<AppConfig>({
+  const [config, setConfig] = useState<EmailConfigContract["Config"]>({
     email: "1960825664@qq.com",
     password: "ltexjnbspblkdehd",
-    server: "smtp.qq.com",
-    port: 465,
+    imapServer: "smtp.qq.com",
+    imapPort: 465,
     namingRule: "{姓名}_{学号}_{作业名}",
   });
 
@@ -44,8 +49,8 @@ export default function App() {
         setConfig({
           email: result.data.email,
           password: "",
-          server: result.data.imapServer || "imap.163.com",
-          port: result.data.imapPort || 993,
+          imapServer: result.data.imapServer || "imap.163.com",
+          imapPort: result.data.imapPort || 993,
           namingRule: result.data.namingRule || "{姓名}_{学号}_{作业名}",
         });
       }
@@ -78,20 +83,21 @@ export default function App() {
       const { data: hwList } = await rpc.api.homework.list.get();
       if (hwList) {
         const submittedIds = new Set();
-        hwList.forEach((h: any) => {
-          if (h.homework.student_id) {
-            submittedIds.add(h.homework.student_id);
+        hwList.forEach((h) => {
+          if (h.homework.studentId) {
+            submittedIds.add(h.homework.studentId);
           }
         });
 
         setHomeworks(
-          hwList.map((h: any) => ({
+          hwList.map((h) => ({
             id: h.homework.id,
-            studentId: h.homework.student_id,
-            fileName: h.homework.file_name,
-            originalName: h.homework.original_name,
-            emailFrom: h.homework.email_from,
-            emailDate: h.homework.email_date,
+            studentId: h.homework.studentId,
+            fileName: h.homework.fileName,
+            originalName: h.homework.originalName,
+            emailFrom: h.homework.emailFrom,
+            emailDate: h.homework.emailDate,
+            hasAttachment: h.homework.hasAttachment,
           }))
         );
 
@@ -323,13 +329,7 @@ function StatCard({
     <div className="shadcn-card flex flex-col gap-2 p-6">
       <div className="flex items-center justify-between text-muted-foreground">
         <span className="font-medium text-sm">{label}</span>
-        <div className="rounded-md bg-muted p-1.5">
-          {React.isValidElement(icon)
-            ? React.cloneElement(icon as React.ReactElement<any>, {
-                className: "w-4 h-4",
-              })
-            : icon}
-        </div>
+        <div className="rounded-md bg-muted p-1.5">{icon}</div>
       </div>
       <div className={`font-bold text-2xl ${color}`}>{value}</div>
     </div>

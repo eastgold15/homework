@@ -2,37 +2,25 @@ import { t } from "elysia";
 import { type InferDTO, spread } from "../helper/utils";
 import { studentsTable } from "../table.schema";
 
-/** [Auto-Generated] Do not edit this tag to keep updates. @generated */
 export const StudentInsertFields = spread(studentsTable, "insert");
-/** [Auto-Generated] Do not edit this tag to keep updates. @generated */
 export const StudentFields = spread(studentsTable, "select");
 export const StudentContract = {
-  /** [Auto-Generated] Do not edit this tag to keep updates. @generated */
   Response: t.Object({
+    ...StudentFields,
+  }),
+  Entity: t.Object({
     ...StudentFields,
   }),
 
   Create: t.Object({
-    ...t.Omit(t.Object(StudentInsertFields), [
-      "id",
-      "createdAt",
-      "updatedAt",
-      "startDate",
-      "endDate",
-      "tenantId",
-      "siteId",
-      "deptId",
-      "createdBy",
-    ]).properties,
-    startDate: t.String(),
-    endDate: t.String(),
+    ...t.Omit(t.Object(StudentInsertFields), ["id", "createdAt"]).properties,
   }),
+
   Update: t.Partial(
     t.Object({
       ...t.Omit(t.Object(StudentInsertFields), [
         "id",
         "createdAt",
-        "updatedAt",
         "startDate",
         "endDate",
         "siteId", // 不允许修改站点
@@ -49,10 +37,19 @@ export const StudentContract = {
     ...t.Partial(t.Object(StudentInsertFields)).properties,
     search: t.Optional(t.String()),
   }),
-  /** [Auto-Generated] Do not edit this tag to keep updates. @generated */
+
   ListResponse: t.Object({
     data: t.Array(t.Object({ ...StudentFields })),
     total: t.Number(),
+  }),
+  Student: t.Object({
+    id: StudentFields.id,
+    name: StudentFields.name,
+    studentId: StudentFields.studentId,
+    className: StudentFields.className,
+    submitted: t.Boolean(),
+    emailMatch: t.Optional(t.String()),
+    submissionTime: t.Optional(t.String()),
   }),
 } as const;
 

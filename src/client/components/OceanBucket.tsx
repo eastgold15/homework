@@ -1,9 +1,9 @@
 import { Anchor, FileText, Filter, Loader2, Mail } from "lucide-react";
 import type React from "react";
-import type { HomeworkItem as EmailFish } from "../../types";
+import type { HomeworkContract } from "#/db/model/home-work.model";
 
 interface Props {
-  emails: EmailFish[];
+  emails: HomeworkContract["HomeworkItem"][];
   isFishing: boolean;
 }
 

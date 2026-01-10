@@ -7,9 +7,12 @@ export const emailConfigTable = s.sqliteTable(
     id: s.integer("id").primaryKey({ autoIncrement: true }),
     email: s.text("email").notNull().unique(),
     password: s.text("password").notNull(),
-    imapServer: s.text("imap_server").default("imap.qq.com"),
-    imapPort: s.integer("imap_port").default(993),
-    namingRule: s.text("naming_rule"),
+    imapServer: s.text("imap_server").notNull().default("imap.qq.com"),
+    imapPort: s.integer("imap_port").notNull().default(993),
+    namingRule: s
+      .text("naming_rule")
+      .notNull()
+      .default("{姓名}_{学号}_{作业名}"),
     createdAt: s
       .integer("created_at", { mode: "timestamp" })
       .default(new Date()),

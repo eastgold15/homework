@@ -2,34 +2,23 @@ import { t } from "elysia";
 import { type InferDTO, spread } from "../helper/utils";
 import { homeworkTable } from "../table.schema";
 
-/** [Auto-Generated] Do not edit this tag to keep updates. @generated */
-export const AdInsertFields = spread(homeworkTable, "insert");
-/** [Auto-Generated] Do not edit this tag to keep updates. @generated */
-export const AdFields = spread(homeworkTable, "select");
-export const HomeWorkContract = {
-  /** [Auto-Generated] Do not edit this tag to keep updates. @generated */
+export const HomeworkInsertFields = spread(homeworkTable, "insert");
+
+export const HomeworkFields = spread(homeworkTable, "select");
+export const HomeworkContract = {
   Response: t.Object({
-    ...AdFields,
+    ...HomeworkFields,
   }),
 
   Create: t.Object({
-    ...t.Omit(t.Object(AdInsertFields), [
-      "id",
-      "createdAt",
-      "updatedAt",
-      "startDate",
-      "endDate",
-      "tenantId",
-      "siteId",
-      "deptId",
-      "createdBy",
-    ]).properties,
+    ...t.Omit(t.Object(HomeworkInsertFields), ["id"]).properties,
     startDate: t.String(),
     endDate: t.String(),
   }),
+
   Update: t.Partial(
     t.Object({
-      ...t.Omit(t.Object(AdInsertFields), [
+      ...t.Omit(t.Object(HomeworkInsertFields), [
         "id",
         "createdAt",
         "updatedAt",
@@ -46,14 +35,26 @@ export const HomeWorkContract = {
   ),
 
   ListQuery: t.Object({
-    ...t.Partial(t.Object(AdInsertFields)).properties,
+    ...t.Partial(t.Object(HomeworkInsertFields)).properties,
     search: t.Optional(t.String()),
   }),
-  /** [Auto-Generated] Do not edit this tag to keep updates. @generated */
+
   ListResponse: t.Object({
-    data: t.Array(t.Object({ ...AdFields })),
+    data: t.Array(t.Object({ ...HomeworkFields })),
     total: t.Number(),
+  }),
+  HomeworkItem: t.Object({
+    id: HomeworkFields.id,
+    studentId: HomeworkFields.studentId,
+    fileName: HomeworkFields.fileName,
+    originalName: HomeworkFields.originalName,
+    emailFrom: HomeworkFields.emailFrom,
+    emailDate: HomeworkFields.emailDate,
+    hasAttachment: t.Boolean(),
+    subject: t.Optional(t.String()),
+    sender: t.Optional(t.String()),
+    timestamp: t.Optional(t.String()),
   }),
 } as const;
 
-export type HomeWorkContract = InferDTO<typeof HomeWorkContract>;
+export type HomeworkContract = InferDTO<typeof HomeworkContract>;

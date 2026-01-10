@@ -35,4 +35,4 @@ const app = new Elysia()
   .use(errorSuite)
   .use(frontendApp)
   .use(ServerApp)
-  .listen(4000);
+  .listen(4510);

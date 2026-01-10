@@ -140,10 +140,10 @@ export const homeworkService = {
           const emailBody = message.parts?.[0]
             ? message.parts[0].body?.toString()
             : "";
-          const namingRule = safeConfig.namingRule
-            ? safeConfig.namingRule
-            : "{姓名}_{学号}_{作业名}";
-          const parseResult = await this.parseNamingRule(
+          const namingRule =
+            (safeConfig.namingRule as string | null | undefined) ??
+            "{姓名}_{学号}_{作业名}";
+          const parseResult = await homeworkService.parseNamingRule(
             fileName,
             namingRule,
             emailBody

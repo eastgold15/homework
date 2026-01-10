@@ -3,7 +3,7 @@
   "version": "1.0.50",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
-    "build": "bun run build",
+    "type-check": "bun run tsc --noEmit",
     "build:exe": "bun run build.ts --compile --outfile server.exe",
     "db:migrate": "bun run drizzle-kit migrate",
     "db:generate": "bun run drizzle-kit generate",

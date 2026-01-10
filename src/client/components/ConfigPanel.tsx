@@ -1,10 +1,12 @@
 import { ArrowRight, Mail, Save, Server, Shield } from "lucide-react";
 import type React from "react";
-import type { AppConfig } from "../types";
+import type { EmailConfigContract } from "#/db/model/email-config";
 
 interface Props {
-  config: AppConfig;
-  setConfig: React.Dispatch<React.SetStateAction<AppConfig>>;
+  config: EmailConfigContract["Config"];
+  setConfig: React.Dispatch<
+    React.SetStateAction<EmailConfigContract["Config"]>
+  >;
   onStart: () => void;
   isFishing: boolean;
   onSave: () => void;
@@ -91,7 +93,7 @@ const ConfigPanel: React.FC<Props> = ({
               setConfig((prev) => ({ ...prev, server: e.target.value }))
             }
             type="text"
-            value={config.server}
+            value={config.imapServer}
           />
         </div>
         <div className="space-y-1.5">
@@ -107,7 +109,7 @@ const ConfigPanel: React.FC<Props> = ({
               }))
             }
             type="number"
-            value={config.port}
+            value={config.imapPort}
           />
         </div>
       </div>

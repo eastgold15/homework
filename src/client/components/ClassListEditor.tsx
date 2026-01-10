@@ -1,11 +1,13 @@
 import { Trash2, UserPlus, Users } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
-import type { Student } from "@/types";
+import type { StudentContract } from "#/db/model/student.model";
 
 interface Props {
-  students: Student[];
-  setStudents: React.Dispatch<React.SetStateAction<Student[]>>;
+  students: StudentContract["Student"][];
+  setStudents: React.Dispatch<
+    React.SetStateAction<Partial<StudentContract["Student"]>[]>
+  >;
 }
 
 const ClassListEditor: React.FC<Props> = ({ students, setStudents }) => {
@@ -16,16 +18,17 @@ const ClassListEditor: React.FC<Props> = ({ students, setStudents }) => {
       .split(/[\n,，]/)
       .map((n) => n.trim())
       .filter((n) => n !== "");
-    const newStudents: Student[] = names.map((name, idx) => ({
-      id: `new-${Date.now()}-${idx}`,
-      name,
-      submitted: false,
-    }));
+    const newStudents: Partial<StudentContract["Student"]>[] = names.map(
+      (name, idx) => ({
+        name,
+        submitted: false,
+      })
+    );
     setStudents((prev) => [...prev, ...newStudents]);
     setNewNames("");
   };
 
-  const removeStudent = (id: string) => {
+  const removeStudent = (id: number) => {
     setStudents((prev) => prev.filter((s) => s.id !== id));
   };
 
